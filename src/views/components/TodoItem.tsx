@@ -4,6 +4,8 @@ import {
   RiCheckboxCircleFill,
 } from 'react-icons/ri';
 import { BsFillTrashFill } from 'react-icons/bs';
+import { deleteTodo, updateTodo } from '../../stores/Slices/todo/todoSlice';
+import { useAppDispatch } from '../../stores/hooks';
 
 
 type Props = {
@@ -14,10 +16,20 @@ type Props = {
 
 
 const TodoItem = ({id, content, isDone}: Props) => {
+
+  const dispatch = useAppDispatch();
+  const handleDeleteClick = () => {
+    dispatch(deleteTodo({ id }));
+  };
+  const handleCheckClick = () => {
+    dispatch(updateTodo({ id }));
+  };
+
   return (
     <Flex w="100%" align="center" justify="space-between">
       <Flex align="center">
         <Icon
+          onClick={handleCheckClick}
           as={ isDone ? RiCheckboxCircleFill : RiCheckboxBlankCircleLine }
           color="teal"
           cursor="pointer"
@@ -33,12 +45,12 @@ const TodoItem = ({id, content, isDone}: Props) => {
         </Text>
       </Flex>
       <Icon
+        onClick={handleDeleteClick}
         as={BsFillTrashFill}
         color="pink"
         cursor="pointer"
         h={5}
         w={5}
-
       />
     </Flex>
   )

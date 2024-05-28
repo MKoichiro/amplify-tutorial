@@ -1,10 +1,14 @@
 import { Box, Button, FormControl, FormErrorMessage, Input } from "@chakra-ui/react"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
+import { useAppDispatch } from "../../stores/hooks";
+import { createTodo } from "../../stores/Slices/todo/todoSlice";
 
 type FormData = {
   content: string;
 }
 const AddTodo = () => {
+  const dispatch = useAppDispatch();
+
   const {
     handleSubmit,
     register,
@@ -13,8 +17,9 @@ const AddTodo = () => {
   } = useForm<FormData>();
 
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    alert(data.content);
+  const onSubmit: SubmitHandler<FieldValues> = ({ content }) => {
+    alert(content);
+    dispatch(createTodo(content));
     reset();
   }
 
