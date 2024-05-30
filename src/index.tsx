@@ -4,6 +4,9 @@ import App from './App.tsx'
 import { ChakraProvider } from '@chakra-ui/react';
 import { store } from './stores/store';
 import { Provider } from 'react-redux';
+import { Amplify } from 'aws-amplify';
+import amplifyconfig from './amplifyconfiguration.json';
+Amplify.configure(amplifyconfig);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

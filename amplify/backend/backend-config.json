@@ -1,1 +1,22 @@
-{}
+{
+  "api": {
+    "amplifyTutorialGql": {
+      "dependsOn": [],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDate": "2025-05-30T09:34:45.508Z",
+              "apiKeyExpirationDays": 365,
+              "description": "amplifyTutorial AuthKey"
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  }
+}
