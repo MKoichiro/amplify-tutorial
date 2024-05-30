@@ -1,6 +1,5 @@
-// import type { PayloadAction } from "@reduxjs/toolkit";
-import { createSlice } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from "uuid";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { fetchTodoListApi } from "./todoAPI";
 
 export interface TodoState {
   todoList: {
@@ -14,29 +13,37 @@ const initialState: TodoState = {
   todoList: [],
 }
 
+export const fetchTodoListAsync = createAsyncThunk(
+  "todo/fetchTodoList",
+  async () => {
+    // 取得処理の実行
+    const response = await fetchTodoListApi();
+    return response;
+  }
+);
+
+
 export const todoSlice = createSlice({
   name: "todo",
   initialState,
   reducers: {
-    createTodo: (state, action) => {
-      const newTodo = {
-        id: uuidv4(),
-        content: action.payload,
-        isDone: false,
-      };
-      state.todoList.push(newTodo);
+    fetchTodoRealTime: (state, action) => {
+      state.todoList.push(action.payload);
     },
-
-    updateTodo: (state, action) => {
-      const todo = state.todoList.find(todo => todo.id === action.payload.id);
-      if (todo) {
-        todo.isDone = !todo.isDone;
+    updateTodoRealTime: (state, action) => {
+      const targetTodo = state.todoList.find(todo => todo.id === action.payload.id);
+      if (targetTodo) {
+        targetTodo.isDone = action.payload.isDone;
       }
     },
-
-    deleteTodo: (state, action) => {
+    deleteTodoRealTime: (state, action) => {
       state.todoList = state.todoList.filter(todo => todo.id !== action.payload.id);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchTodoListAsync.fulfilled, (state, action) => {
+      state.todoList = action.payload;
+    });
   },
   selectors: {
     selectTodoList: (state: TodoState) => state.todoList,
@@ -44,7 +51,5 @@ export const todoSlice = createSlice({
 });
 
 
-export const { createTodo, updateTodo, deleteTodo } = todoSlice.actions;
+export const { fetchTodoRealTime, updateTodoRealTime, deleteTodoRealTime } = todoSlice.actions;
 export const { selectTodoList } = todoSlice.selectors;
-
-// export default todoSlice.reducer;

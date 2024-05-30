@@ -1,64 +1,48 @@
-import { selectTodoList } from '../../stores/Slices/todo/todoSlice';
-import { useAppSelector } from '../../stores/hooks';
+import { useEffect } from 'react';
+import { deleteTodoRealTime, fetchTodoListAsync, fetchTodoRealTime, selectTodoList, updateTodoRealTime } from '../../stores/Slices/todo/todoSlice';
+import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import TodoItem from './TodoItem';
 import { Center, Flex, Heading, StackDivider, Text, VStack } from '@chakra-ui/react';
+import { DataStore } from 'aws-amplify/datastore';
+import { Todo } from '../../models';
 
 const TodoList = () => {
-  // const todoList = [
-  //   {
-  //     id: "aaa",
-  //     content: "aaa content",
-  //     isDone: true,
-  //   },
-  //   {
-  //     id: "bbb",
-  //     content: "bbb content",
-  //     isDone: false,
-  //   },
-  //   {
-  //     id: "ccc",
-  //     content: "ccc content",
-  //     isDone: true,
-  //   },
-  //   {
-  //     id: "ddd",
-  //     content: "ddd content",
-  //     isDone: false,
-  //   },
-  //   {
-  //     id: "eee",
-  //     content: "eee content",
-  //     isDone: true,
-  //   },
-  //   {
-  //     id: "fff",
-  //     content: "fff content",
-  //     isDone: false,
-  //   },
-  //   {
-  //     id: "ggg",
-  //     content: "ggg content",
-  //     isDone: true,
-  //   },
-  //   {
-  //     id: "hhh",
-  //     content: "hhh content",
-  //     isDone: false,
-  //   },
-  //   {
-  //     id: "iii",
-  //     content: "iii content",
-  //     isDone: true,
-  //   },
-  //   {
-  //     id: "jjj",
-  //     content: "jjj content",
-  //     isDone: false,
-  //   },
-  // ];
-
   const todoList = useAppSelector(selectTodoList);
-  console.log(todoList);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // todoListの取得処理
+    const fetchTodoList = async () => {
+      await dispatch(fetchTodoListAsync());
+    };
+    fetchTodoList();
+  }, [dispatch]);
+
+  useEffect(() => {
+    // todoテーブルの変更をリアルタイムに検知
+    const subscribeTodoList = DataStore.observe(Todo).subscribe((msg) => {
+      switch (msg.opType) {
+        case 'INSERT':
+          dispatch(fetchTodoRealTime(msg.element));
+          break;
+        case 'UPDATE':
+          dispatch(updateTodoRealTime(msg.element));
+          break;
+        case 'DELETE':
+          dispatch(deleteTodoRealTime(msg.element));
+          break;
+        default:
+          break;
+      }
+    });
+
+    // subscribeTodoList.subscribe();
+
+    return () => {
+      subscribeTodoList.unsubscribe();
+    };
+  }, [dispatch]);
+
   return (
     <Flex flexDir='column' align="center">
       <Center mb={8}>
